@@ -12,6 +12,11 @@ import joblib
 import matplotlib.pyplot as plt
 import pandas_datareader.data as web
 import datetime
+try:
+    import pandas_datareader.data as web
+    FRED_AVAILABLE = True
+except Exception:
+    FRED_AVAILABLE = False
 
 plt.rcParams.update({
     'axes.spines.top': False, 'axes.spines.right': False,
@@ -95,6 +100,8 @@ def load_data(_config):
     # --- EXUSEU: încercăm FRED live, cu fallback la fișierul local ---
     sursa_curs = "live (FRED)"
     try:
+        if not FRED_AVAILABLE:
+            raise ImportError("pandas-datareader indisponibil")
         start = datetime.datetime(1999, 1, 1)
         end = datetime.datetime.now()
         df_fx = web.DataReader('EXUSEU', 'fred', start, end).reset_index()
