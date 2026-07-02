@@ -10,12 +10,15 @@ import torch
 import torch.nn as nn
 import joblib
 import matplotlib.pyplot as plt
-import pandas_datareader.data as web
 import datetime
+
+# pandas-datareader este optional: pe unele medii (ex. pandas 3.x) importul poate
+# esua, caz in care aplicatia foloseste fisierul local EXUSEU.csv ca fallback.
 try:
     import pandas_datareader.data as web
     FRED_AVAILABLE = True
 except Exception:
+    web = None
     FRED_AVAILABLE = False
 
 plt.rcParams.update({
