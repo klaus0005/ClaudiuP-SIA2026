@@ -21,23 +21,10 @@ except Exception:
     web = None
     FRED_AVAILABLE = False
 
-# --- Paleta agronomica (aceleasi culori ca in interfata, fara albastru) ---
-INK      = "#2a2e1f"   # cerneala olive-inchis
-INK_SOFT = "#6b6d5c"
-PAPER    = "#f5f3ec"   # hartie ovaz
-GOLD     = "#a8842c"   # accent auriu-recolta
-BUY      = "#b5482e"   # teracota (pret in crestere -> cumpara)
-WAIT     = "#5f7a3f"   # verde-masliniu (pret in scadere -> asteapta)
-MONITOR  = "#bf8a1e"   # chihlimbar (neutru)
-LINE     = "#dcd7c8"
-
 plt.rcParams.update({
     'axes.spines.top': False, 'axes.spines.right': False,
-    'axes.grid': True, 'grid.alpha': 0.18, 'grid.color': INK,
-    'font.size': 10, 'axes.titlesize': 12, 'axes.titleweight': 'bold',
-    'text.color': INK, 'axes.labelcolor': INK, 'axes.edgecolor': LINE,
-    'xtick.color': INK_SOFT, 'ytick.color': INK_SOFT,
-    'figure.facecolor': PAPER, 'axes.facecolor': PAPER, 'savefig.facecolor': PAPER,
+    'axes.grid': True, 'grid.alpha': 0.25,
+    'font.size': 10, 'axes.titlesize': 12, 'axes.titleweight': 'bold'
 })
 
 # ==========================================================================
@@ -46,115 +33,16 @@ plt.rcParams.update({
 st.set_page_config(page_title="DSS Preț Uree", page_icon="🌾", layout="wide",
                    initial_sidebar_state="collapsed")
 
-# ==========================================================================
-# STIL — tipografie (Fraunces / Inter / IBM Plex Mono) + paleta agronomica
-# ==========================================================================
-st.markdown(f"""
+# CSS
+st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
-
-:root {{
-  --ink: {INK}; --ink-soft: {INK_SOFT}; --paper: {PAPER};
-  --gold: {GOLD}; --line: {LINE};
-  --buy: {BUY}; --wait: {WAIT}; --monitor: {MONITOR};
-}}
-
-.stApp {{ background: var(--paper); }}
-.main .block-container {{ padding-top: 2.4rem; padding-bottom: 3rem; max-width: 1080px; }}
-
-/* Tipografie de baza */
-html, body, [class*="css"], .stMarkdown, p, li, label {{
-  font-family: 'Inter', system-ui, sans-serif; color: var(--ink);
-}}
-
-/* Titlu principal */
-h1 {{
-  font-family: 'Fraunces', Georgia, serif !important;
-  font-weight: 600 !important; color: var(--ink) !important;
-  letter-spacing: -0.01em; line-height: 1.12; margin-bottom: 0.35rem;
-}}
-
-/* Anteturi de sectiune personalizate (inlocuiesc st.header) */
-.section-head {{ margin: 2.6rem 0 1.1rem; }}
-.section-head .eyebrow {{
-  font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
-  letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold);
-  font-weight: 500; margin-bottom: 0.35rem;
-}}
-.section-head .title {{
-  font-family: 'Fraunces', Georgia, serif; font-size: 1.5rem;
-  font-weight: 600; color: var(--ink); line-height: 1.15;
-  padding-bottom: 0.55rem; border-bottom: 1px solid var(--line);
-}}
-
-/* Cifre / metrici in monospace, stil "registru" */
-[data-testid="stMetric"] {{
-  background: #fbfaf4; border: 1px solid var(--line);
-  border-radius: 8px; padding: 0.9rem 1.05rem;
-}}
-[data-testid="stMetricValue"] {{
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 1.55rem !important; font-weight: 600; color: var(--ink);
-}}
-[data-testid="stMetricLabel"] {{
-  font-size: 0.82rem !important; color: var(--ink-soft);
-  text-transform: uppercase; letter-spacing: 0.04em;
-}}
-
-/* Card de recomandare personalizat */
-.reco {{
-  border-radius: 10px; padding: 1.15rem 1.35rem; margin: 0.4rem 0 0.2rem;
-  border: 1px solid var(--line); border-left-width: 5px;
-}}
-.reco .verdict {{
-  font-family: 'Fraunces', Georgia, serif; font-size: 1.35rem;
-  font-weight: 600; margin-bottom: 0.25rem;
-}}
-.reco .detail {{ font-size: 0.96rem; color: var(--ink); line-height: 1.5; }}
-.reco.buy     {{ border-left-color: var(--buy);     background: #f7ece7; }}
-.reco.buy .verdict     {{ color: var(--buy); }}
-.reco.wait    {{ border-left-color: var(--wait);    background: #eef2e8; }}
-.reco.wait .verdict    {{ color: var(--wait); }}
-.reco.monitor {{ border-left-color: var(--monitor); background: #f7efdc; }}
-.reco.monitor .verdict {{ color: #8a6414; }}
-
-/* Nota informativa (economie estimata) */
-.note {{
-  font-size: 0.94rem; color: var(--ink); background: #fbfaf4;
-  border: 1px solid var(--line); border-radius: 8px; padding: 0.8rem 1rem;
-}}
-
-/* Fir de sursa de date, sus */
-.datasource {{
-  font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem;
-  color: var(--ink-soft); letter-spacing: 0.02em;
-}}
-
-/* Hairline discret care inlocuieste st.divider */
-.rule {{ height: 1px; background: var(--line); margin: 1.4rem 0 0.2rem; }}
-
-/* Subsol */
-.footer {{
-  margin-top: 2.6rem; padding-top: 1rem; border-top: 1px solid var(--line);
-  font-size: 0.82rem; color: var(--ink-soft); line-height: 1.5;
-}}
-
-/* Tabel (backtest) mai discret */
-[data-testid="stDataFrame"] {{ border: 1px solid var(--line); border-radius: 8px; }}
-
-/* Slider si input pe accentul auriu */
-[data-testid="stSlider"] [role="slider"] {{ background-color: var(--gold) !important; }}
+    .main .block-container {padding-top: 2rem; max-width: 1100px;}
+    h1 {color: #1a3a5c; font-weight: 700;}
+    h2 {color: #2c5f8a; border-bottom: 2px solid #e8eef4; padding-bottom: 0.3rem; margin-top: 2rem;}
+    [data-testid="stMetricValue"] {font-size: 1.8rem;}
+    .stAlert {border-radius: 10px;}
 </style>
 """, unsafe_allow_html=True)
-
-
-def section(number, eyebrow, title):
-    """Anteturi de sectiune uniforme (etichete mono + fir auriu)."""
-    st.markdown(
-        f'<div class="section-head"><div class="eyebrow">{number} · {eyebrow}</div>'
-        f'<div class="title">{title}</div></div>',
-        unsafe_allow_html=True)
-
 
 # ==========================================================================
 # DEFINIREA MODELULUI (trebuie identica cu cea din notebook)
@@ -236,6 +124,8 @@ def load_data(_config):
 
 model, scaler, config = load_model_and_config()
 df_prices, sursa_curs = load_data(config)
+st.caption(f"📡 Sursă curs valutar: {sursa_curs} | Ultima lună: {df_prices.index[-1].strftime('%Y-%m')}")
+st.divider()
 LOOK_BACK = config['look_back']
 features = config['features']
 
@@ -269,21 +159,15 @@ def predict_next(df_prices, model, scaler, look_back):
 # ==========================================================================
 # INTERFATA
 # ==========================================================================
-st.title("Sistem de Suport Decizional — Achiziție Uree")
-st.markdown("Predicția prețului ureei pe luna următoare și o recomandare de achiziție, "
-            "pe baza unui model BiLSTM cu variabile exogene (energie, curs valutar).")
-
-st.markdown(
-    f'<div class="datasource">Sursă curs valutar: {sursa_curs}&nbsp;&nbsp;·&nbsp;&nbsp;'
-    f'ultima lună disponibilă: {df_prices.index[-1].strftime("%Y-%m")}</div>',
-    unsafe_allow_html=True)
-st.markdown('<div class="rule"></div>', unsafe_allow_html=True)
+st.title("🌾 Sistem de Suport Decizional — Achiziție Uree")
+st.markdown("Predicția prețului ureei pe luna următoare și recomandare de achiziție, "
+            "bazată pe un model BiLSTM cu variabile exogene (energie, curs valutar).")
 
 current_price, predicted_price, pct_change = predict_next(df_prices, model, scaler, LOOK_BACK)
 last_date = df_prices.index[-1]
 
 # --- SECTIUNEA 1: PREDICTIE T+1 ---
-section("01", "Prognoză", "Predicție lună următoare")
+st.header("📊 Predicție lună următoare")
 col1, col2, col3 = st.columns(3)
 col1.metric("Preț curent", f"{current_price:.2f} $/t",
             help=f"Ultima lună disponibilă: {last_date.strftime('%Y-%m')}")
@@ -292,52 +176,47 @@ col2.metric("Preț prezis (T+1)", f"{predicted_price:.2f} $/t",
 col3.metric("Variație prezisă", f"{pct_change:+.2f}%")
 
 # --- SECTIUNEA 2: RECOMANDARE ---
-section("02", "Decizie", "Recomandare de achiziție")
+st.header("🎯 Recomandare")
 PRAG = 5.0  # pragul de +/- 5%
 
 if pct_change > PRAG:
-    st.markdown(
-        f'<div class="reco buy"><div class="verdict">Cumpără acum</div>'
-        f'<div class="detail">Modelul anticipează o creștere de <b>{pct_change:+.2f}%</b>. '
-        f'Achiziția în luna curentă evită scumpirea anticipată.</div></div>',
-        unsafe_allow_html=True)
+    st.error(f"### 🔴 CUMPĂRĂ ACUM\n"
+             f"Modelul prezice o creștere de **{pct_change:+.2f}%**. "
+             f"Achiziția acum evită scumpirea anticipată.")
     recomandare = "CUMPĂRĂ"
 elif pct_change < -PRAG:
-    st.markdown(
-        f'<div class="reco wait"><div class="verdict">Așteaptă</div>'
-        f'<div class="detail">Modelul anticipează o scădere de <b>{pct_change:+.2f}%</b>. '
-        f'Amânarea achiziției poate reduce costul.</div></div>',
-        unsafe_allow_html=True)
+    st.success(f"### 🟢 AȘTEAPTĂ\n"
+               f"Modelul prezice o scădere de **{pct_change:+.2f}%**. "
+               f"Amânarea achiziției poate reduce costul.")
     recomandare = "AȘTEAPTĂ"
 else:
-    st.markdown(
-        f'<div class="reco monitor"><div class="verdict">Monitorizează</div>'
-        f'<div class="detail">Variația prezisă (<b>{pct_change:+.2f}%</b>) este sub pragul '
-        f'de ±{PRAG:.0f}%. Nu există un semnal clar; se recomandă urmărirea pieței.</div></div>',
-        unsafe_allow_html=True)
+    st.warning(f"### 🟡 MONITORIZEAZĂ\n"
+               f"Variația prezisă (**{pct_change:+.2f}%**) este sub pragul de ±{PRAG}%. "
+               f"Nu există un semnal clar; se recomandă monitorizarea pieței.")
     recomandare = "MONITORIZEAZĂ"
 
 # --- SECTIUNEA 3: GRAFIC ISTORIC ---
-section("03", "Istoric", "Evoluția prețului")
+st.header("📈 Evoluție istorică")
 n_months = st.slider("Câte luni de istoric să afișez?", 12, len(df_prices), 60)
 
 fig, ax = plt.subplots(figsize=(11, 4))
 hist = df_prices['UREA_EE_BULK'].iloc[-n_months:]
-ax.plot(hist.index, hist.values, color=INK, linewidth=1.6, label='Preț istoric')
+ax.plot(hist.index, hist.values, color='#2c5f8a', linewidth=1.5, label='Preț istoric')
 # Punctul de predictie
 next_date = last_date + pd.DateOffset(months=1)
-ax.scatter([next_date], [predicted_price], color=GOLD, s=90, zorder=5,
+ax.scatter([next_date], [predicted_price], color='#d1495b', s=80, zorder=5,
            label=f'Predicție ({predicted_price:.0f} $/t)')
 ax.plot([last_date, next_date], [current_price, predicted_price],
-        color=GOLD, linestyle='--', linewidth=1.8)
+        color='#d1495b', linestyle='--', linewidth=1.5)
 ax.set_xlabel('Data')
 ax.set_ylabel('Preț ($/tonă)')
-ax.legend(loc='upper left', frameon=False)
+ax.legend(loc='upper left')
+ax.grid(True, alpha=0.3)
 st.pyplot(fig)
 
 # --- SECTIUNEA 4: SIMULARE IMPACT FINANCIAR ---
-section("04", "Simulare", "Impact financiar")
-st.markdown("Estimează efectul deciziei pentru o cantitate dată de uree.")
+st.header("💰 Simulare impact financiar")
+st.markdown("Estimează impactul deciziei pentru o cantitate dată de uree.")
 
 cantitate = st.number_input("Cantitate de achiziționat (tone)", min_value=1, value=100, step=10)
 
@@ -346,24 +225,22 @@ cost_prezis = cantitate * predicted_price
 diferenta = cost_prezis - cost_acum
 
 col1, col2, col3 = st.columns(3)
-col1.metric("Cost dacă cumperi acum", f"{cost_acum:,.0f} $")
+col1.metric("Cost dacă cumperi ACUM", f"{cost_acum:,.0f} $")
 col2.metric("Cost estimat luna viitoare", f"{cost_prezis:,.0f} $")
 col3.metric("Diferență", f"{diferenta:+,.0f} $",
             delta=f"{pct_change:+.2f}%", delta_color="inverse")
 
 if diferenta > 0:
-    st.markdown(f'<div class="note">Cumpărând acum, economisești estimativ '
-                f'<b>{abs(diferenta):,.0f} $</b> față de achiziția de luna viitoare.</div>',
-                unsafe_allow_html=True)
+    st.info(f"Cumpărând acum, economisești estimativ **{abs(diferenta):,.0f} $** "
+            f"față de achiziția de luna viitoare.")
 elif diferenta < 0:
-    st.markdown(f'<div class="note">Așteptând, poți economisi estimativ '
-                f'<b>{abs(diferenta):,.0f} $</b> față de achiziția de acum.</div>',
-                unsafe_allow_html=True)
+    st.info(f"Așteptând, poți economisi estimativ **{abs(diferenta):,.0f} $** "
+            f"față de achiziția de acum.")
 
 # --- SECTIUNEA 5: BACKTESTING ---
-section("05", "Validare", "Backtesting — performanța istorică")
+st.header("🔬 Backtesting — performanța istorică a strategiei")
 st.markdown("Simulează: dacă ai fi urmat recomandările modelului în ultimele luni, "
-            "cum ar fi evoluat deciziile față de o achiziție lunară constantă?")
+            "cum ar fi evoluat deciziile vs. o achiziție lunară constantă?")
 
 @st.cache_data
 def run_backtest(_df_prices, _config, n_test_months=24):
@@ -417,12 +294,11 @@ bt_display = bt_df.copy()
 bt_display['data'] = bt_display['data'].dt.strftime('%Y-%m')
 bt_display['prezis_%'] = bt_display['prezis_%'].round(2)
 bt_display['real_%'] = bt_display['real_%'].round(2)
-bt_display['directie_corecta'] = bt_display['directie_corecta'].map({True: 'corect', False: 'greșit'})
-bt_display.columns = ['Lună', 'Prezis (%)', 'Real (%)', 'Direcție']
+bt_display['directie_corecta'] = bt_display['directie_corecta'].map({True: '✅', False: '❌'})
+bt_display.columns = ['Lună', 'Prezis (%)', 'Real (%)', 'Direcție corectă']
 st.dataframe(bt_display, width='stretch', hide_index=True)
 
 # --- FOOTER ---
-st.markdown(
-    '<div class="footer">Model: BiLSTM (fereastră 6 luni, 10 variabile exogene). '
-    'Predicțiile au caracter orientativ și nu constituie consultanță financiară.</div>',
-    unsafe_allow_html=True)
+st.markdown("---")
+st.caption("Model: BiLSTM (fereastră 6 luni, 10 variabile exogene). "
+           "Notă: predicțiile au caracter orientativ și nu constituie consultanță financiară.")
